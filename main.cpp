@@ -13,5 +13,6 @@ int main() {
             }
         if(!found)
             std::cout<<x[i]<<" ";
-    }
+    } 
+    return 0;
 }
