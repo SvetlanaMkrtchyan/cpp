@@ -1,5 +1,4 @@
 #include <iostream>
-//#include <string>
 #include <map>
 using namespace std;
 
@@ -25,7 +24,8 @@ double factor(){
     if(s[i]=='('){
         i++;
         double result=expression();
-        i++;
+        if(i<s.length() && s[i]==')')
+            i++;
         return result;
     }
 
@@ -38,7 +38,7 @@ double factor(){
 
 double term(){
     double result=factor();
-    while(i<s.length() && s[i]=='*' || s[i]=='/'){
+    while(i<s.length() && (s[i]=='*' || s[i]=='/')){
         char op=s[i++];
         if(op=='*')
             result*=factor();
@@ -50,7 +50,7 @@ double term(){
 
 double expression(){
     double result=term();
-    while(i<s.length() && s[i]=='+' || s[i]=='-'){
+    while(i<s.length() && (s[i]=='+' || s[i]=='-')){
         char op=s[i++];
         if(op=='+')
             result+=term();
@@ -65,7 +65,7 @@ int main (){
     cin>>s;
     for(double v=0.0; v<=100.0; v+=0.01){
         for(char c='a'; c<='z'; c++)
-            variables[c] = v;
+            variables[c]=v;
         i=0;
         cout<<expression()<<endl;
     }

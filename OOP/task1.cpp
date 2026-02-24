@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 using namespace std;
 
 int i = 0;
@@ -23,7 +22,8 @@ double factor(){
     if(s[i]=='('){
         i++;
         double result=expression();
-        i++;
+        if(i<s.length() && s[i]==')')
+            i++;
         return result;
     }
     return number();
@@ -31,7 +31,7 @@ double factor(){
 
 double term(){
     double result=factor();
-    while(i<s.length() && s[i]=='*' || s[i]=='/'){
+    while(i<s.length() && (s[i]=='*' || s[i]=='/')){
         char op=s[i++];
         if(op=='*')
             result*=factor();
@@ -43,7 +43,7 @@ double term(){
 
 double expression(){
     double result=term();
-    while(i<s.length() && s[i]=='+' || s[i]=='-'){
+    while(i<s.length() && (s[i]=='+' || s[i]=='-')){
         char op=s[i++];
         if(op=='+')
             result+=term();
@@ -54,6 +54,7 @@ double expression(){
 }
 
 int main (){
+    cout<<"Enter an expression: ";
     cin>>s;
     i=0;
     cout<<expression()<<endl;
