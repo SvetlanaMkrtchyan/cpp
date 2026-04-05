@@ -7,14 +7,14 @@ using namespace std;
 
 enum class OpCode : uint32_t {
     MOV_CONST,     
-    LOAD_VAR,     
-    STORE_VAR,      
+    LOAD_VAR,       
+    STORE_VAR,     
     ADD, SUB, MUL, DIV,
     CMP_EQ, CMP_NEQ, CMP_LT, CMP_GT, CMP_LTE, CMP_GTE,
-    JMP,           
-    JMP_IF_FALSE,   
-    CALL,           
-    RET,            
+    JMP,            
+    JMP_IF_FALSE, 
+    CALL,          
+    RET,          
     HALT
 };
 

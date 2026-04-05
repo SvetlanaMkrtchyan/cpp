@@ -2,18 +2,17 @@
 #include "lexer.h"
 
 static unique_ptr<ExprNode> parsePrimary() {
-    if (atEnd()) 
-        return nullptr;
+    if (atEnd()) return nullptr;
 
     if (peek(VARIABLE) && curIdx+1 < (int)tokenList.size() && tokenList[curIdx+1].type == LPAREN) {
         string name = consume().value;
-        consume(); 
+        consume();  // (
         auto node = make_unique<ExprNode>(NodeKind::FUNC_CALL_NODE, name);
         while (!atEnd() && !peekVal(")")) {
             node->children.push_back(parseExpr());
             if (peekVal(",")) consume();
         }
-        if (!atEnd()) consume(); 
+        if (!atEnd()) consume();  
         return node;
     }
 
@@ -74,7 +73,7 @@ unique_ptr<ExprNode> parseExpr() { return parseComparison(); }
 static unique_ptr<ExprNode> parseAssignOrExpr() {
     if (peek(VARIABLE) && curIdx+1 < (int)tokenList.size() && tokenList[curIdx+1].value == "=") {
         string varName = consume().value;
-        consume();  // =
+        consume();  
         auto node = make_unique<ExprNode>(NodeKind::ASSIGN_NODE, varName);
         node->left = parseExpr();
         return node;
@@ -86,7 +85,7 @@ unique_ptr<ExprNode> parseStatement() {
     if (atEnd()) return nullptr;
 
     if (peek(KW_IF)) {
-        consume();  // if
+        consume();  
         if (peek(LPAREN)) consume();
         auto cond = parseExpr();
         if (peek(RPAREN)) consume();
@@ -95,7 +94,7 @@ unique_ptr<ExprNode> parseStatement() {
         node->cond  = move(cond);
         node->left  = move(thenBody);
         if (peek(KW_ELSE)) {
-            consume();  // else
+            consume();  
             node->right = peek(KW_IF) ? parseStatement() : parseBlock();
         }
         return node;
@@ -117,7 +116,7 @@ unique_ptr<ExprNode> parseStatement() {
         consume();  
         auto node = make_unique<ExprNode>(NodeKind::FUNC_DEF_NODE, fname);
         while (!atEnd() && !peek(RPAREN)) {
-            if (peek(KW_INT) || peek(KW_DOUBLE)) consume();  
+            if (peek(KW_INT) || peek(KW_DOUBLE)) consume();  // param type
             if (peek(VARIABLE)) node->params.push_back(consume().value);
             if (peek(COMMA)) consume();
         }
@@ -133,7 +132,7 @@ unique_ptr<ExprNode> parseStatement() {
 
 unique_ptr<ExprNode> parseBlock() {
     if (peek(LBRACE)) {
-        consume(); 
+        consume();  
         auto seq = make_unique<ExprNode>(NodeKind::SEQUENCE_NODE, "seq");
         while (!atEnd() && !peek(RBRACE)) {
             auto s = parseStatement();

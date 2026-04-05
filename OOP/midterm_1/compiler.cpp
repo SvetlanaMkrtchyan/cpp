@@ -10,7 +10,6 @@ int compile(
 ) {
     if (!node) return -1;
 
-    // Map operator string → OpCode
     auto opFor = [](const string& s) -> OpCode {
         if (s == "+")  return OpCode::ADD;
         if (s == "-")  return OpCode::SUB;
@@ -36,7 +35,6 @@ int compile(
 
     switch (node->kind) {
 
-    // ── Literal ──────────────────────────────
     case NodeKind::NUM_NODE: {
         int r = nextReg++;
         uint32_t ci = constPool.size();
@@ -45,21 +43,18 @@ int compile(
         return r;
     }
 
-    // ── Variable load ─────────────────────────
     case NodeKind::VAR_NODE: {
         int r = nextReg++;
         emit(OpCode::LOAD_VAR, r, ensureVar(node->text), 0);
         return r;
     }
 
-    // ── Assignment ───────────────────────────
     case NodeKind::ASSIGN_NODE: {
         int r = compile(node->left.get(), prog, constPool, nextReg, varMap);
         emit(OpCode::STORE_VAR, r, ensureVar(node->text), 0);
         return r;
     }
 
-    // ── Binary arithmetic / comparison ───────
     case NodeKind::OP_NODE:
     case NodeKind::CMP_NODE: {
         int l = compile(node->left.get(),  prog, constPool, nextReg, varMap);
@@ -69,36 +64,28 @@ int compile(
         return t;
     }
 
-    // ── if / else if / else ──────────────────
     case NodeKind::IF_NODE: {
         int condReg = compile(node->cond.get(), prog, constPool, nextReg, varMap);
 
-        // Placeholder: JMP_IF_FALSE → else/end
         int jmpFalsePos = prog.size();
         emit(OpCode::JMP_IF_FALSE, condReg, 0, 0);
 
-        // Then-body
         int thenReg = compile(node->left.get(), prog, constPool, nextReg, varMap);
 
-        // Placeholder: JMP → end (skip else)
         int jmpEndPos = prog.size();
         emit(OpCode::JMP, 0, 0, 0);
 
-        // Patch JMP_IF_FALSE → start of else
         prog[jmpFalsePos].leftIdx = prog.size();
 
-        // Else-body (optional)
         int elseReg = -1;
         if (node->right)
             elseReg = compile(node->right.get(), prog, constPool, nextReg, varMap);
 
-        // Patch JMP → here (end of if/else)
         prog[jmpEndPos].resIdx = prog.size();
 
         return thenReg >= 0 ? thenReg : elseReg;
     }
 
-    // ── Statement sequence ───────────────────
     case NodeKind::SEQUENCE_NODE: {
         int last = -1;
         for (auto& child : node->children)
@@ -106,14 +93,12 @@ int compile(
         return last;
     }
 
-    // ── return ───────────────────────────────
     case NodeKind::RETURN_NODE: {
         int r = node->left ? compile(node->left.get(), prog, constPool, nextReg, varMap) : -1;
         emit(OpCode::RET, r, 0, 0);
         return r;
     }
 
-    // ── Function definition ──────────────────
     case NodeKind::FUNC_DEF_NODE: {
         FuncEntry fe;
         fe.name   = node->text;
@@ -132,7 +117,6 @@ int compile(
         return -1;
     }
 
-    // ── Function call ─────────────────────────
     case NodeKind::FUNC_CALL_NODE: {
         vector<int> argRegs;
         for (auto& arg : node->children)

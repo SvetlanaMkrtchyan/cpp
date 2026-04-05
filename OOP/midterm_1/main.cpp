@@ -9,9 +9,6 @@ using namespace std;
 
 int main() {
     cout << "Expression / Program Compiler\n";
-    cout << "Supports: arithmetic, comparisons (< > == != <= >=),\n";
-    cout << "          if/else if/else, function definitions and calls,\n";
-    cout << "          assignments (x = ...), return, sequences.\n";
     cout << "\nEnter: ";
 
     string input;
@@ -43,10 +40,7 @@ int main() {
             dumpProgram(fe.code, fe.constPool, pmap, "Function: " + fe.name);
         }
 
-        if (mainProg.empty()) { 
-            cout << "\nNo executable code.\n"; 
-            return 0;
-        }
+        if (mainProg.empty()) { cout << "\nNo executable code.\n"; return 0; }
 
         cout << "\nPress Enter to run for x = 1.00..100.00...";
         cin.ignore();
@@ -64,5 +58,6 @@ int main() {
     } catch (const exception& e) {
         cerr << "Error: " << e.what() << "\n";
     }
+
     return 0;
 }
