@@ -150,7 +150,7 @@ void tokenizeInput(string input){
 double evaluateFromVector(const vector<Instruction>& insts,map<string,double>& vars){
     map<string,double> temps;
     auto getVal=[&](string s){
-        if (isdigit(s[0]) || (s.size()>1&&s[0]=='-'))
+        if (isdigit(s[0]) || (s.size()>1 && s[0]=='-'))
             return stod(s);
         if (temps.count(s)) 
             return temps[s];
@@ -170,11 +170,12 @@ double evaluateFromVector(const vector<Instruction>& insts,map<string,double>& v
         else if (inst.op=="*")
             res=v1*v2;
         else if (inst.op=="/")
-            res=(v2!=0)?v1/v2:0;
+            res=(v2!=0) ? v1/v2 : 0;
         temps[inst.target]=res;
     }
 
-    if(insts.empty())return 0;
+    if(insts.empty())
+        return 0;
     return temps[insts.back().target];
 }
 
