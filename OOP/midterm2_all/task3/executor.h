@@ -7,8 +7,9 @@
 #include <string>
 
 struct VMState {
-    double   regs[NUM_REGS] = {};
-    int      pc             = 0;
+    uint32_t regs[NUM_REGS] = {}; 
+    uint32_t IR             = 0;  
+    int      pc             = 0;  
     bool     halted         = false;
     Memory*  mem            = nullptr;
 };

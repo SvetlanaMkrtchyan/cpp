@@ -14,9 +14,11 @@ double execute(
     double*                    regs,
     int                        startPC
 ) {
+    uint32_t IR = 0;  
     int pc = startPC;
     while (pc < (int)prog.size()) {
-        const auto& inst = prog[pc++];
+        IR = *reinterpret_cast<const uint32_t*>(&prog[pc]);
+        const Instruction& inst = prog[pc++];
         switch ((OpCode)inst.op) {
         case OpCode::MOV_CONST:    regs[inst.resIdx] = constPool[inst.leftIdx]; break;
         case OpCode::LOAD_VAR:     regs[inst.resIdx] = varValues[inst.leftIdx]; break;
@@ -27,7 +29,8 @@ double execute(
         case OpCode::ADD:      regs[inst.resIdx] = regs[inst.leftIdx] + regs[inst.rightIdx]; break;
         case OpCode::SUB:      regs[inst.resIdx] = regs[inst.leftIdx] - regs[inst.rightIdx]; break;
         case OpCode::MUL:      regs[inst.resIdx] = regs[inst.leftIdx] * regs[inst.rightIdx]; break;
-        case OpCode::DIV:      regs[inst.resIdx] = regs[inst.rightIdx] != 0 ? regs[inst.leftIdx] / regs[inst.rightIdx] : 0; break;
+        case OpCode::DIV:      regs[inst.resIdx] = regs[inst.rightIdx] != 0
+                                   ? regs[inst.leftIdx] / regs[inst.rightIdx] : 0; break;
         case OpCode::MOD:      regs[inst.resIdx] = fmod(regs[inst.leftIdx], regs[inst.rightIdx]); break;
         case OpCode::BIT_AND:  regs[inst.resIdx] = (int64_t)regs[inst.leftIdx] & (int64_t)regs[inst.rightIdx]; break;
         case OpCode::BIT_OR:   regs[inst.resIdx] = (int64_t)regs[inst.leftIdx] | (int64_t)regs[inst.rightIdx]; break;
@@ -82,12 +85,13 @@ double callFunction(int funcIdx, vector<double> args) {
     auto& fe = funcTable[funcIdx];
     double regs[NUM_REGS] = {};
     vector<double> varVals(max((int)fe.params.size() + 32, 64), 0.0);
-    for (int i = 0; i < (int)args.size() && i < (int)fe.params.size(); ++i)
+    for (int i = 0; i < (int)args.size() && i < (int)fe.params.size(); i++)
         varVals[i] = args[i];
     return execute(fe.code, fe.constPool, varVals, regs, 0);
 }
 
-static string formatInst(int idx, const Instruction& inst, const vector<double>& constPool, const map<int,string>& revVar) {
+static string formatInst(int idx, const Instruction& inst, const vector<double>& constPool,
+                          const map<int,string>& revVar) {
     ostringstream ss;
     OpCode op = (OpCode)inst.op;
     ss << "[" << setw(3) << idx << "]  " << left << setw(16) << opNames[inst.op];
@@ -148,8 +152,7 @@ void runDebugger(
     const map<string, int>&    varMap
 ) {
     map<int, string> revVar;
-    for (auto& [name, id] : varMap) 
-        revVar[id] = name;
+    for (auto& [name, id] : varMap) revVar[id] = name;
 
     double regs[NUM_REGS] = {};
     set<int> breakpoints;
@@ -281,11 +284,15 @@ double executeWithMemory(
     Memory&                    memory,
     int                        startPC
 ) {
-    double regs[NUM_REGS] = {};
+    uint32_t regs[NUM_REGS] = {}; 
+    uint32_t IR = 0;              
     int pc = startPC;
 
     while (pc < (int)prog.size()) {
-        const auto& inst = prog[pc++];
+        // Fetch: IR = Mem[IP]
+        IR = memory.read32(memory.codeRegion.base + pc * 4);
+        const Instruction& inst = *reinterpret_cast<const Instruction*>(&IR);
+        pc++;  // Advance IP
         switch ((OpCode)inst.op) {
         case OpCode::MOV_CONST:
             regs[inst.resIdx] = constPool[inst.leftIdx];

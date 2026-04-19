@@ -4,21 +4,11 @@
 vector<Token> tokenList;
 int           curIdx = 0;
 
-Token& cur()                    { 
-    return tokenList[curIdx]; 
-}
-bool   atEnd()                  { 
-    return curIdx >= (int)tokenList.size(); 
-}
-Token  consume()                { 
-    return tokenList[curIdx++]; 
-}
-bool   peek(TokenType t)        { 
-    return !atEnd() && cur().type == t; 
-}
-bool   peekVal(const string& v) { 
-    return !atEnd() && cur().value == v; 
-}
+Token& cur()                    { return tokenList[curIdx]; }
+bool   atEnd()                  { return curIdx >= (int)tokenList.size(); }
+Token  consume()                { return tokenList[curIdx++]; }
+bool   peek(TokenType t)        { return !atEnd() && cur().type == t; }
+bool   peekVal(const string& v) { return !atEnd() && cur().value == v; }
 
 void tokenize(const string& input) {
     tokenList.clear();

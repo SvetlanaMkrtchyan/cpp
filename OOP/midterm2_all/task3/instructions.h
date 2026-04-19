@@ -6,7 +6,7 @@
 
 using namespace std;
 
-static constexpr int NUM_REGS = 32;
+static constexpr int NUM_REGS = 16;
 
 enum class OpCode : uint32_t {
     MOV_CONST,

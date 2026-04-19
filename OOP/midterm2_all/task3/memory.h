@@ -20,13 +20,13 @@ struct Memory {
     uint64_t   hp;
     std::vector<uint8_t> mem;
 
-    explicit Memory(uint64_t total = 1 << 24) : totalSize(total) {
+    explicit Memory(uint64_t total = 64 * 1024) : totalSize(total) {
         uint64_t q = total / 4;
-        codeRegion  = { 0,     q };
-        dataRegion  = { q,     q };
-        stackRegion = { q * 2, q };
-        heapRegion  = { q * 3, q };
-        sp = stackRegion.base + stackRegion.size;
+        codeRegion  = { 0,         q };    
+        stackRegion = { q,         q };     
+        dataRegion  = { q * 2,     q };    
+        heapRegion  = { q * 3,     q };    
+        sp = stackRegion.base + stackRegion.size; // stack grows down
         hp = heapRegion.base;
         mem.resize(total, 0);
     }

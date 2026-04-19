@@ -37,10 +37,7 @@ int compile(
     };
 
     auto ensureVar = [&](const string& name) -> int {
-        if (!varMap.count(name)) { 
-            int id = varMap.size(); 
-            varMap[name] = id; 
-        }
+        if (!varMap.count(name)) { int id = varMap.size(); varMap[name] = id; }
         return varMap[name];
     };
 
